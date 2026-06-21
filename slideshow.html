@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Neurodivergenz – Slideshow</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: #0f0f1a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; }
+#ss { width: 100%; height: 100vh; height: 100dvh; position: relative; overflow: hidden; }
+.slide { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6% 7%; opacity: 0; transition: opacity 1s ease; text-align: center; }
+.slide.active { opacity: 1; }
+.s1 { background: radial-gradient(ellipse at 30% 50%, #1e1b4b 0%, #0f0f1a 70%); }
+.s2 { background: radial-gradient(ellipse at 70% 30%, #0c2340 0%, #0f0f1a 70%); }
+.s3 { background: radial-gradient(ellipse at 30% 70%, #1a0a3b 0%, #0f0f1a 70%); }
+.s4 { background: radial-gradient(ellipse at 60% 60%, #042f1a 0%, #0f0f1a 70%); }
+.s5 { background: radial-gradient(ellipse at 40% 40%, #2a0a0a 0%, #0f0f1a 70%); }
+.s6 { background: radial-gradient(ellipse at 65% 35%, #1a0a2a 0%, #0f0f1a 70%); }
+.s7 { background: radial-gradient(ellipse at 35% 65%, #032a2a 0%, #0f0f1a 70%); }
+
+.tag { display: inline-block; padding: 6px 20px; border-radius: 30px; font-size: clamp(11px,1.8vw,16px); font-weight: 700; margin-bottom: 20px; letter-spacing: 1.5px; text-transform: uppercase; }
+.slide h1 { font-size: clamp(36px,7.5vw,90px); font-weight: 800; color: #fff; line-height: 1.05; margin-bottom: 18px; }
+.slide h2 { font-size: clamp(24px,4.5vw,56px); font-weight: 700; color: #fff; line-height: 1.1; margin-bottom: 16px; }
+.slide p { font-size: clamp(15px,2.2vw,26px); color: rgba(255,255,255,.75); line-height: 1.65; max-width: 75%; }
+.icon { font-size: clamp(52px,9vw,100px); margin-bottom: 18px; display: block; animation: float 3s ease-in-out infinite; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+.pill-grid { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 24px; max-width: 820px; }
+.pill { padding: 10px 24px; border-radius: 30px; font-size: clamp(13px,2vw,20px); font-weight: 600; border: 2px solid; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; max-width: 860px; margin-top: 24px; text-align: left; }
+.col-box { background: rgba(255,255,255,.07); border-radius: 14px; padding: 20px; border: 1px solid rgba(255,255,255,.12); }
+.col-box ul { list-style: none; padding: 0; }
+.col-box ul li { font-size: clamp(13px,1.8vw,20px); color: rgba(255,255,255,.75); padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+.col-box ul li:last-child { border-bottom: none; }
+.col-box ul li::before { content: "→ "; opacity: .45; }
+.ct { font-size: clamp(13px,1.8vw,20px); font-weight: 700; margin-bottom: 12px; letter-spacing: .5px; }
+
+.bignum { font-size: clamp(72px,14vw,140px); font-weight: 800; line-height: 1; margin-bottom: 8px; }
+
+.person-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; width: 100%; max-width: 840px; margin-top: 24px; }
+.pc { background: rgba(255,255,255,.08); border-radius: 14px; padding: 16px 12px; border: 1px solid rgba(255,255,255,.12); }
+.pc .pn { font-size: clamp(13px,1.8vw,18px); color: #fff; font-weight: 700; margin-bottom: 5px; }
+.pc .pd { font-size: clamp(11px,1.3vw,14px); color: rgba(255,255,255,.5); line-height: 1.4; }
+
+.quote { font-size: clamp(17px,2.8vw,32px) !important; font-style: italic; color: rgba(255,255,255,.92) !important; max-width: 78% !important; }
+.qauthor { font-size: clamp(13px,1.6vw,18px) !important; color: rgba(255,255,255,.42) !important; margin-top: 14px !important; }
+
+.pbar { position: absolute; bottom: 0; left: 0; height: 5px; background: rgba(255,255,255,.2); transition: width 15s linear; border-radius: 0 3px 3px 0; }
+.dots { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.25); transition: background .3s, width .3s; cursor: pointer; }
+.dot.active { background: #fff; width: 26px; border-radius: 4px; }
+.nbtn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); border-radius: 50%; width: 48px; height: 48px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 22px; transition: background .2s; }
+.nbtn:hover { background: rgba(255,255,255,.22); }
+.nprev { left: 16px; } .nnext { right: 16px; }
+.snum { position: absolute; top: 16px; right: 72px; font-size: 14px; color: rgba(255,255,255,.3); font-weight: 500; }
+.controls { position: absolute; top: 12px; left: 16px; display: flex; gap: 8px; }
+.ctrl-btn { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: 20px; color: rgba(255,255,255,.65); font-size: 13px; padding: 6px 14px; cursor: pointer; font-family: inherit; font-weight: 500; }
+#fsBtn { position: absolute; top: 12px; right: 16px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: 8px; color: rgba(255,255,255,.65); padding: 7px 12px; cursor: pointer; font-size: 18px; }
+</style>
+</head>
+<body>
+<div id="ss">
+  <div class="slide s1 active">
+    <span class="icon">🧠</span>
+    <div class="tag" style="background:rgba(139,92,246,.2);color:#c4b5fd;border:1px solid rgba(139,92,246,.4)">Tag der Vielfalt</div>
+    <h1>Neurodivergenz</h1>
+    <p>Wenn Gehirne anders funktionieren – und das völlig okay ist.</p>
+  </div>
+
+  <div class="slide s2">
+    <div class="tag" style="background:rgba(59,130,246,.2);color:#93c5fd;border:1px solid rgba(59,130,246,.3)">Was bedeutet das?</div>
+    <h2>Neurotypisch vs. Neurodivergent</h2>
+    <div class="two-col">
+      <div class="col-box">
+        <div class="ct" style="color:#93c5fd">Neurotypisch</div>
+        <ul><li>Gehirn entwickelt sich „typisch"</li><li>Entspricht gesellschaftlicher Norm</li><li>Gilt als statistischer Standard</li></ul>
+      </div>
+      <div class="col-box">
+        <div class="ct" style="color:#a78bfa">Neurodivergent</div>
+        <ul><li>Gehirn funktioniert anders</li><li>Keine Krankheit – eine Variante</li><li>Andere Stärken &amp; Herausforderungen</li></ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide s3">
+    <div class="tag" style="background:rgba(124,58,237,.2);color:#c4b5fd;border:1px solid rgba(124,58,237,.3)">Formen</div>
+    <h2>Welche Formen gibt es?</h2>
+    <div class="pill-grid">
+      <div class="pill" style="color:#a78bfa;border-color:rgba(167,139,250,.5);background:rgba(167,139,250,.1)">ADHS</div>
+      <div class="pill" style="color:#6ee7b7;border-color:rgba(110,231,183,.5);background:rgba(110,231,183,.1)">Autismus-Spektrum</div>
+      <div class="pill" style="color:#93c5fd;border-color:rgba(147,197,253,.5);background:rgba(147,197,253,.1)">Legasthenie</div>
+      <div class="pill" style="color:#fcd34d;border-color:rgba(252,211,77,.5);background:rgba(252,211,77,.1)">Dyskalkulie</div>
+      <div class="pill" style="color:#f9a8d4;border-color:rgba(249,168,212,.5);background:rgba(249,168,212,.1)">Hochbegabung</div>
+      <div class="pill" style="color:#fb923c;border-color:rgba(251,146,60,.5);background:rgba(251,146,60,.1)">Tourette-Syndrom</div>
+      <div class="pill" style="color:#34d399;border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.1)">Dyspraxie</div>
+    </div>
+    <p style="margin-top:20px">Viele Menschen sind mehrfach neurodivergent – das nennt sich „Co-Morbidität".</p>
+  </div>
+
+  <div class="slide s4">
+    <div class="tag" style="background:rgba(16,185,129,.2);color:#6ee7b7;border:1px solid rgba(16,185,129,.3)">Zahlen</div>
+    <div class="bignum" style="color:#6ee7b7">1 von 5</div>
+    <h2>Menschen ist neurodivergent</h2>
+    <p>In einer Klasse mit 25 Schüler:innen sind das etwa <strong style="color:#6ee7b7">5 Personen</strong> – ob diagnostiziert oder nicht.</p>
+  </div>
+
+  <div class="slide s5">
+    <div class="tag" style="background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.3)">Stärken</div>
+    <h2>Andere Gehirne – andere Superkräfte</h2>
+    <div class="two-col">
+      <div class="col-box">
+        <div class="ct" style="color:#fca5a5">Häufige Stärken</div>
+        <ul><li>Kreatives Denken</li><li>Hyperfokus auf Interessen</li><li>Mustererkennung</li><li>Empathie &amp; Einfühlungsvermögen</li><li>Direktheit &amp; Ehrlichkeit</li></ul>
+      </div>
+      <div class="col-box">
+        <div class="ct" style="color:#f9a8d4">Häufige Herausforderungen</div>
+        <ul><li>Aufmerksamkeit regulieren</li><li>Soziale Normen lesen</li><li>Lesen &amp; Schreiben</li><li>Sensorische Reize</li><li>Zeitmanagement</li></ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide s6">
+    <div class="tag" style="background:rgba(139,92,246,.2);color:#c4b5fd;border:1px solid rgba(139,92,246,.3)">Vorbilder</div>
+    <h2>Neurodivergente Persönlichkeiten</h2>
+    <div class="person-grid">
+      <div class="pc"><div class="pn">Albert Einstein</div><div class="pd">Physiker – Autismus &amp; Legasthenie</div></div>
+      <div class="pc"><div class="pn">Greta Thunberg</div><div class="pd">Aktivistin – Autismus-Spektrum</div></div>
+      <div class="pc"><div class="pn">Steve Jobs</div><div class="pd">Unternehmer – vermutl. ADHS</div></div>
+      <div class="pc"><div class="pn">Simone Biles</div><div class="pd">Turnerin – ADHS-Diagnose</div></div>
+      <div class="pc"><div class="pn">Leonardo da Vinci</div><div class="pd">Künstler &amp; Erfinder – vermutl. ADHS</div></div>
+      <div class="pc"><div class="pn">Temple Grandin</div><div class="pd">Wissenschaftlerin – Autismus-Spektrum</div></div>
+    </div>
+  </div>
+
+  <div class="slide s7">
+    <span class="icon" style="animation:none">💬</span>
+    <div class="tag" style="background:rgba(20,184,166,.2);color:#5eead4;border:1px solid rgba(20,184,166,.3)">Zum Nachdenken</div>
+    <p class="quote">"Neurodivergenz ist kein Fehler im System – sie ist ein anderer Weg, die Welt zu verarbeiten."</p>
+    <p class="qauthor">Anders denken ist keine Schwäche. Es ist eine andere Stärke.</p>
+    <div class="pill-grid" style="margin-top:28px">
+      <div class="pill" style="color:#5eead4;border-color:rgba(94,234,212,.5);background:rgba(94,234,212,.1)">Komm zum Tisch – mach das Quiz! 🎯</div>
+    </div>
+  </div>
+
+  <div class="pbar" id="pb"></div>
+  <div class="dots" id="dots"></div>
+  <button class="nbtn nprev" id="prev">‹</button>
+  <button class="nbtn nnext" id="next">›</button>
+  <div class="snum" id="snum"></div>
+  <div class="controls">
+    <button class="ctrl-btn" id="pauseBtn">⏸ Pause</button>
+  </div>
+  <button id="fsBtn" onclick="toggleFS()">⛶</button>
+</div>
+<script>
+const slides=document.querySelectorAll('.slide'),dotsEl=document.getElementById('dots'),pb=document.getElementById('pb'),snum=document.getElementById('snum'),pauseBtn=document.getElementById('pauseBtn');
+let cur=0,timer,paused=false,D=15000;
+slides.forEach((_,i)=>{const d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.addEventListener('click',()=>goTo(i));dotsEl.appendChild(d);});
+function goTo(n){slides[cur].classList.remove('active');dotsEl.children[cur].classList.remove('active');cur=(n+slides.length)%slides.length;slides[cur].classList.add('active');dotsEl.children[cur].classList.add('active');snum.textContent=(cur+1)+' / '+slides.length;resetBar();}
+function resetBar(){clearTimeout(timer);pb.style.transition='none';pb.style.width='0%';if(paused)return;setTimeout(()=>{pb.style.transition='width '+D+'ms linear';pb.style.width='100%';},50);timer=setTimeout(()=>goTo(cur+1),D);}
+document.getElementById('prev').addEventListener('click',()=>goTo(cur-1));
+document.getElementById('next').addEventListener('click',()=>goTo(cur+1));
+pauseBtn.addEventListener('click',()=>{paused=!paused;pauseBtn.textContent=paused?'▶ Weiter':'⏸ Pause';if(paused){clearTimeout(timer);pb.style.transition='none';}else{resetBar();}});
+function toggleFS(){if(!document.fullscreenElement&&!document.webkitFullscreenElement){const el=document.documentElement;if(el.requestFullscreen)el.requestFullscreen();else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();document.getElementById('fsBtn').textContent='✕';}else{if(document.exitFullscreen)document.exitFullscreen();else if(document.webkitExitFullscreen)document.webkitExitFullscreen();document.getElementById('fsBtn').textContent='⛶';}}
+snum.textContent='1 / '+slides.length;resetBar();
+</script>
+</body>
+</html>
